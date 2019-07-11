@@ -1,0 +1,457 @@
+import tkinter
+import pygeoip
+from tkinter import messagebox
+from tabview import TabView
+from dragwindow import DragWindow
+from tkinter import ttk
+from mydialog import MyDialog
+
+class FindLocation(object):
+    def __init__(self):
+        self.gi = pygeoip.GeoIP("./GeoLiteCity.dat")
+        # 创建主窗口,用于容纳其它组件
+        self.root = tkinter.Tk()
+        # 给主窗口设置标题内容
+        self.root.title("全球定位ip位置(离线版)")
+        # 创建一个输入框,并设置尺寸
+        self.ip_input = tkinter.Entry(self.root, width=30)
+
+        # 创建一个回显列表
+        self.display_info = tkinter.Listbox(self.root, width=50)
+
+        # 创建一个查询结果的按钮
+        self.result_button = tkinter.Button(self.root, command=self.find_position, text="查询")
+
+    # 完成布局
+    def gui_arrang(self):
+        self.ip_input.pack()
+        self.display_info.pack()
+        self.result_button.pack()
+
+    # 根据ip查找地理位置
+    def find_position(self):
+        # 获取输入信息
+        self.ip_addr = self.ip_input.get()
+        aim = self.gi.record_by_name(self.ip_addr)
+        # 为了避免非法值,导致程序崩溃,有兴趣可以用正则写一下具体的规则,我为了便于新手理解,减少代码量,就直接粗放的过滤了
+        try:
+
+            # 获取目标城市
+            city = aim["city"]
+            # 获取目标国家
+            country = aim["country_name"]
+            # 获取目标地区
+            region_code = aim["region_code"]
+            # 获取目标经度
+            longitude = aim["longitude"]
+            # 获取目标纬度
+            latitude = aim["latitude"]
+        except:
+            pass
+
+        # 创建临时列表
+        the_ip_info = ["所在纬度:" + str(latitude), "所在经度:" + str(longitude), "地域代号:" + str(region_code),
+                       "所在城市:" + str(city), "所在国家或地区:" + str(country), "需要查询的ip:" + str(self.ip_addr)]
+        # 清空回显列表可见部分,类似clear命令
+        for item in range(10):
+            self.display_info.insert(0, "")
+
+        # 为回显列表赋值
+        for item in the_ip_info:
+            self.display_info.insert(0, item)
+        # 这里的返回值,没啥用,就是为了好看
+        return the_ip_info
+
+
+def main():
+    # 初始化对象
+    FL = FindLocation()
+    # 进行布局
+    FL.gui_arrang()
+    # 主程序执行
+    tkinter.mainloop()
+    pass
+
+class GuiTest(object):
+
+    def gui_test1(self):#helloworld
+        win=tkinter.Tk();
+        win.title("GUI 弹框居中")
+        # 得到屏幕宽度
+        sw = win.winfo_screenwidth()
+        # 得到屏幕高度
+        sh = win.winfo_screenheight()
+        ww = 100
+        wh = 100
+        '''
+        窗口宽高为100
+        屏幕宽 - 窗口宽 = 窗口两边的宽度（记得是两边，仔细想想）
+        然后我们除于一半得到屏幕左边的宽度，这就是我们窗口位于屏幕x轴开始的位置
+        '''
+        x = (sw - ww) / 2
+        y = (sh - wh) / 2
+        win.geometry("%dx%d+%d+%d" % (ww, wh, x, y))
+
+    def gui_test2(self): #单组件填充满父组件
+        root = tkinter.Tk();
+        root.title("GUI pack单组件填充满父组件")
+        text = tkinter.Text(root);
+        # INSERT索引表示在光标处插入
+        text.insert(tkinter.INSERT,"hello ")
+        # END索引号表示在最后插入
+        text.insert(tkinter.END, "world")
+        text.pack(expand="yes", fill="both");
+
+    def gui_test3(self): #多组件填充满父组件
+        root = tkinter.Tk();
+        root.title("GUI pack多组件填充满父组件")
+        text = tkinter.Text(root);
+        # INSERT索引表示在光标处插入
+        text.insert(tkinter.INSERT,"hello world")
+        text.pack(expand="yes", fill="both");
+
+        btn=tkinter.Button(root,text="点我",background="blue",command=self.show);
+        btn.pack(anchor="center",fill="y")
+    def show(self):
+        messagebox.showinfo(title="点我",message="真点啊");
+
+    def gui_test4(self): #单组件填充满父组件
+        root = tkinter.Tk();
+        root.title("GUI grid单组件填充满父组件")
+        root.rowconfigure(0, weight=1)
+        root.columnconfigure(0, weight=1)
+        text = tkinter.Text(root);
+        # INSERT索引表示在光标处插入
+        text.insert(tkinter.INSERT,"hello world")
+        text.grid();
+
+    def gui_test5(self): #多组件布局（滚动条）
+        root = tkinter.Tk();
+        root.title("GUI grid多组件布局（滚动条）")
+        root.rowconfigure(0, weight=1)
+        root.columnconfigure(0, weight=1)
+        text = tkinter.Text(root);
+        # INSERT索引表示在光标处插入
+        text.insert(tkinter.INSERT,"hello world")
+        text.grid();
+        # 纵向
+        sb = tkinter.Scrollbar(root)
+        sb.grid(row=0, column=1, sticky='ns')
+        text.configure(yscrollcommand=sb.set)
+        sb.configure(command=text.yview)
+        # 横向
+        sb = tkinter.Scrollbar(root, orient='horizontal')
+        sb.grid(row=1, column=0, sticky='ew')
+        text.configure(xscrollcommand=sb.set)
+        sb.configure(command=text.xview)
+
+    def gui_test6(self):  # 绝对布局
+        win = tkinter.Tk()
+        win.title("GUI 绝对布局")  # #窗口标题
+        win.geometry("600x500")  #主框体大小 #窗口位置500后面是字母x
+        '''
+        绝对布局
+        '''
+        label1 = tkinter.Label(win, text="柳多妍", bg="pink")
+        label2 = tkinter.Label(win, text="多多", bg="yellow")
+        label3 = tkinter.Label(win, text="超级飞侠", bg="red")
+        # label1.pack()   # #默认没有布局，字有多长，背景也有多长，和其他label错落显示
+        # label2.pack()
+        # label3.pack()
+        label1.place(x=10, y=10)  # #固定坐标，按绝对布局显示，窗口大小的变化对布局没有影响
+        label2.place(x=50, y=50)
+        label3.place(x=100, y=100)
+
+    def gui_test7(self):  # 相对布局
+        win = tkinter.Tk()
+        win.title("GUI 相对布局")  # #窗口标题
+        win.geometry("600x500+200+20")  # #窗口位置500后面是字母x
+        '''
+        相对布局,窗体改变对空间有影响
+        '''
+        label1 = tkinter.Label(win, text="柳多妍", bg="pink")
+        label2 = tkinter.Label(win, text="多多", bg="yellow")
+        label3 = tkinter.Label(win, text="超级飞侠", bg="red")
+        label1.pack(fill=tkinter.Y, side=tkinter.LEFT)  # #相对布局
+        label2.pack(fill=tkinter.X, side=tkinter.TOP)
+        label3.pack()
+
+    def gui_test8(self):  # 表格布局
+        win = tkinter.Tk()
+        win.title("GUI 表格布局")  # #窗口标题
+        win.geometry("600x500+200+20")  # #窗口位置500后面是字母x
+
+        '''
+        相对布局,窗体改变对空间有影响
+        '''
+        label1 = tkinter.Label(win, text="柳多妍", bg="pink")
+        label2 = tkinter.Label(win, text="多多", bg="yellow")
+        label3 = tkinter.Label(win, text="超级飞侠", bg="red")
+        label4 = tkinter.Label(win, text="小猪佩奇", bg="green")
+        label1.grid(row=0, column=0)
+        label2.grid(row=0, column=1)
+        label3.grid(row=1, column=0)
+        label4.grid(row=1, column=1)
+
+    def gui_test9(self):  # 框架控件
+        win = tkinter.Tk()
+        win.title("GUI 框架控件")  # #窗口标题
+        win.geometry("600x500+200+20")  # #窗口位置500后面是字母x
+        '''
+        框架控件，作用：作为一种容器，可以把其他空间放在frame上。
+        '''
+        frm = tkinter.Frame(win)  # #创建一个frame控件
+        frm.pack()
+
+        # #左侧
+        frm_1 = tkinter.Frame(frm)  # #创建一个frm_1并且放到frm上
+        tkinter.Label(frm_1, text="左上", bg="pink").pack(side=tkinter.TOP)  # #创建一个Lable放到frm_1上
+        tkinter.Label(frm_1, text="左下", bg="green").pack(side=tkinter.TOP)
+        frm_1.pack(side=tkinter.LEFT)  # #frm_1的位置放在左侧
+
+        # #右侧
+        frm_r = tkinter.Frame(frm)
+        tkinter.Label(frm_r, text="右上", bg="red").pack(side=tkinter.TOP)
+        tkinter.Label(frm_r, text="右下", bg="yellow").pack(side=tkinter.TOP)
+        frm_r.pack(side=tkinter.RIGHT)
+
+    def gui_test10(self):  # 界面切换
+        win = tkinter.Tk()
+        win.title("GUI 界面切换")  # #窗口标题
+        win.geometry("600x500+200+20")  # #窗口位置500后面是字母x
+        self.master = win
+        self.master.config(bg='green')
+        # 基准界面initface
+        self.initface = tkinter.Frame(self.master, )
+        self.initface.pack()
+        btn = tkinter.Button(self.initface, text='change', command=self.change)
+        btn.pack()
+
+    def change(self):
+        self.initface.destroy()
+        self.master.config(bg='blue')
+        self.face1 = tkinter.Frame(self.master, )
+        self.face1.pack()
+        btn_back = tkinter.Button(self.face1, text='face1 back', command=self.back)
+        btn_back.pack()
+    def back(self):
+        self.face1.destroy()
+        self.master.config(bg='green')
+        # 基准界面initface
+        self.initface = tkinter.Frame(self.master, )
+        self.initface.pack()
+        btn = tkinter.Button(self.initface, text='change', command=self.change)
+        btn.pack()
+
+    def gui_test11(self):  # 自定义tabview
+        root = tkinter.Tk()
+        root.title("自定义tabview");
+        root.geometry("640x300")
+
+        tab_view = TabView(root, generate_body=self.create_body,
+                           select_listen=self.select, remove_listen=self.remove)
+
+        body = tab_view.body
+
+        label_1 = tkinter.Label(tab_view.body, text="this is tab1")
+        label_2 = tkinter.Label(tab_view.body, text="this is tab2")
+
+        # 第一个参数是向body中添加的widget, 第二个参数是tab标题
+        tab_view.add_tab(label_1, "tabs1")
+        tab_view.add_tab(label_2, "tabs2")
+
+        # TabView需要向x、y方向填充，且expand应设置为yes
+        tab_view.pack(fill="both", expand='yes', pady=2)
+        self.view=tab_view
+        self.text="新标签"
+        btn = tkinter.Button(root, text="新增", background="blue", command=self.addTab);
+        btn.pack(anchor="center", fill="y")
+
+    # 在body中生成widget的函数，返回的widget将被添加到tabview的body中
+    def create_body(self):
+        global body
+        return tkinter.Label(body, text="this is body")
+
+    # 点击选项卡时的回调
+    def select(self,index):
+        print("current selected -->", index)
+
+    # 删除选项卡时的回调，如果返回False将不会删除
+    def remove(self,index):
+        print("remove tab -->", index)
+        if messagebox.askokcancel("标题", "确定要关闭该选项卡吗？"):
+            return True
+        else:
+            return False
+    def addTab(self):
+        print("add Tab -->")
+        label_1 = tkinter.Label(self.view.body, text="this is tab1")
+        self.view.add_tab(label_1, self.text)
+
+    def gui_test12(self):  # 拖拽小挂件
+        root = DragWindow()
+        root.set_window_size(200, 200)
+        root.set_display_postion(500, 400)
+        tkinter.Button(root, text="Exit", command=root.quit).pack(side=tkinter.BOTTOM)
+
+    def gui_test13(self):  # 菜单
+        win = tkinter.Tk()
+        win.title("GUI 菜单")  # 菜单
+        win.geometry("600x500+200+20")  # #窗口位置500后面是字母x
+
+        win.filenew_icon = tkinter.PhotoImage(file='images/add.png')
+        win.fileopen_icon = tkinter.PhotoImage(file='images/open.png')
+        menubar = tkinter.Menu(win)
+        # 添加菜单条
+        win['menu'] = menubar
+        # 创建file_menu菜单，它被放入menubar中
+        file_menu = tkinter.Menu(menubar, tearoff=0)
+        # 使用add_cascade方法添加file_menu菜单
+        menubar.add_cascade(label='文件', menu=file_menu)
+        # 创建lang_menu菜单，它被放入menubar中
+        lang_menu = tkinter.Menu(menubar, tearoff=0)
+        # 使用add_cascade方法添加lang_menu菜单
+        menubar.add_cascade(label='选择语言', menu=lang_menu)
+        # 使用add_command方法为file_menu添加菜单项
+        file_menu.add_command(label="新建", command=None,
+                              image=win.filenew_icon, compound=tkinter.LEFT)
+        file_menu.add_command(label="打开", command=None,
+                              image=win.fileopen_icon, compound=tkinter.LEFT)
+        # 使用add_command方法为file_menu添加分隔条
+        file_menu.add_separator()
+        # 为file_menu创建子菜单
+        sub_menu = tkinter.Menu(file_menu, tearoff=0)
+        # 使用add_cascade方法添加sub_menu子菜单
+        file_menu.add_cascade(label='选择性别', menu=sub_menu)
+        self.genderVar = tkinter.IntVar()
+        # 使用循环为sub_menu子菜单添加菜单项
+        for i, im in enumerate(['男', '女', '保密']):
+            # 使用add_radiobutton方法为sub_menu子菜单添加单选菜单项
+            # 绑定同一个变量，说明它们是一组
+            sub_menu.add_radiobutton(label=im, command=self.choose_gender,
+                                     variable=self.genderVar, value=i)
+        self.langVars = [tkinter.StringVar(), tkinter.StringVar(), tkinter.StringVar(), tkinter.StringVar()]
+        # 使用循环为lang_menu菜单添加菜单项
+        for i, im in enumerate(('Python', 'Kotlin', 'Swift', 'Java')):
+            # 使用add_add_checkbutton方法为lang_menu菜单添加多选菜单项
+            lang_menu.add_checkbutton(label=im, command=self.choose_lang,
+                                      onvalue=im, variable=self.langVars[i])
+
+    def choose_gender(self):
+        tkinter.messagebox.showinfo(message=('选择的性别为: %s' % self.genderVar.get()))
+
+    def choose_lang(self):
+        rt_list = [e.get() for e in self.langVars]
+        tkinter.messagebox.showinfo(message=('选择的语言为: %s' % ','.join(rt_list)))
+
+    def gui_test14(self):  # Label 显示文本和图片
+        win = tkinter.Tk()
+        win.title("GUI 显示文本和图片")  # 菜单
+        win.geometry("500x200")  # #窗口位置500后面是字母x
+        self.master=win
+        # 创建一个位图
+        bm = tkinter.PhotoImage(file='images/Panda.png')
+        # 创建一个Label，同时指定text和image
+        self.label = tkinter.Label(self.master, text='Havesk',
+                               image=bm, font=('StSong', 20, 'bold'), foreground='red')
+        self.label.bm = bm
+        # 设置Label默认的compound为None
+        self.label['compound'] = None
+        self.label.pack()
+        # 创建Frame容器，用于装多个Radiobutton
+        f = tkinter.Frame(self.master)
+        f.pack(fill=tkinter.BOTH, expand=tkinter.YES)
+        compounds = ('None', "LEFT", "RIGHT", "TOP", "BOTTOM", "CENTER")
+        # 定义一个StringVar变量，用作绑定Radiobutton的变量
+        self.var = tkinter.StringVar()
+        self.var.set('None')
+        # 使用循环创建多个Radionbutton组件
+        for val in compounds:
+            rb = tkinter.Radiobutton(f,
+                             text=val,
+                             padx=20,
+                             variable=self.var,
+                             command=self.change_compound,
+                             value=val).pack(side=tkinter.LEFT, anchor=tkinter.CENTER)
+        # 实现change_compound方法，用于动态改变Label的compound选项
+
+    def change_compound(self):
+        self.label['compound'] = self.var.get().lower()
+
+    def gui_test15(self):  # 消息框
+        win = tkinter.Tk()
+        win.title("GUI 消息框")  # 菜单
+        win.geometry("800x300")  # #窗口位置500后面是字母x
+        self.master = win
+        # -----------创建第1个Labelframe，用于选择图标类型-----------
+        topF = tkinter.Frame(self.master)
+        topF.pack(fill=tkinter.BOTH)
+        lf1 = ttk.Labelframe(topF, text='请选择图标类型')
+        lf1.pack(side=tkinter.LEFT, fill=tkinter.BOTH, expand=tkinter.YES, padx=10, pady=5)
+        i = 0
+        self.iconVar = tkinter.IntVar()
+        self.icons = [None, "error", "info", "question", "warning"]
+        # 使用循环创建多个Radiobutton，并放入Labelframe中
+        for icon in self.icons:
+            tkinter.Radiobutton(lf1, text=icon if icon is not None else '默认',
+                        value=i,
+                        variable=self.iconVar).pack(side=tkinter.TOP, anchor=tkinter.W)
+            i += 1
+        self.iconVar.set(0)
+        # -----------创建第二个Labelframe，用于选择按钮类型-----------
+        lf2 = ttk.Labelframe(topF, text='请选择按钮类型')
+        lf2.pack(side=tkinter.LEFT, fill=tkinter.BOTH, expand=tkinter.YES, padx=10, pady=5)
+        i = 0
+        self.typeVar = tkinter.IntVar()
+        # 定义所有按钮类型
+        self.types = [None, "abortretryignore", "ok", "okcancel",
+                      "retrycancel", "yesno", "yesnocancel"]
+        # 使用循环创建多个Radiobutton，并放入Labelframe中
+        for tp in self.types:
+            tkinter.Radiobutton(lf2, text=tp if tp is not None else '默认',
+                        value=i,
+                        variable=self.typeVar).pack(side=tkinter.TOP, anchor=tkinter.W)
+            i += 1
+        self.typeVar.set(0)
+        # -----------创建Frame,用于包含多个按钮来生成不同的消息框-----------
+        bottomF = tkinter.Frame(self.master)
+        bottomF.pack(fill=tkinter.BOTH)
+        # 创建1个按钮，并为之绑定事件处理函数
+        btn1 = tkinter.Button(bottomF, text="弹出框",
+                          command=self.showinfo_clicked)
+        btn1.pack();
+
+    def showinfo_clicked(self):
+        print(tkinter.messagebox.showinfo("消息框", self.iconVar.get(),
+                              icon=self.icons[self.iconVar.get()],
+                              type=self.types[self.typeVar.get()]))
+
+    def gui_test16(self):  # 自定义对话框
+        win = tkinter.Tk()
+        win.title("GUI 自定义对话框")  # 菜单
+        win.geometry("250x200")  # #窗口位置500后面是字母x
+        self.master = win
+
+        # 创建2个按钮，并为之绑定事件处理函数
+        ttk.Button(self.master, text='模式对话框',
+                   command=self.open_modal  # 绑定open_modal方法
+                   ).pack(side=tkinter.LEFT, ipadx=5, ipady=5, padx=10)
+        ttk.Button(self.master, text='非模式对话框',
+                   command=self.open_none_modal  # 绑定open_none_modal方法
+                   ).pack(side=tkinter.LEFT, ipadx=5, ipady=5, padx=10)
+
+    def open_modal(self):
+        d = MyDialog(self.master, title='模式对话框')  # 默认是模式对话框
+
+    def open_none_modal(self):
+        d = MyDialog(self.master, title='非模式对话框', modal=False)
+
+if __name__ == "__main__":
+   #main()
+   FL = GuiTest()
+   # 进行布局
+   FL.gui_test16()
+   # 主程序执行
+   tkinter.mainloop()
+
+
