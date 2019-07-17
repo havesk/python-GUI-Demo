@@ -5,6 +5,9 @@ from tabview import TabView
 from dragwindow import DragWindow
 from tkinter import ttk
 from mydialog import MyDialog
+from tkinter import filedialog
+from canvasgame import canvasgame
+from painting import painting
 
 class FindLocation(object):
     def __init__(self):
@@ -446,11 +449,163 @@ class GuiTest(object):
     def open_none_modal(self):
         d = MyDialog(self.master, title='非模式对话框', modal=False)
 
+    def gui_test17(self):  # 变量双向绑定
+        win = tkinter.Tk()
+        win.title("GUI 变量双向绑定")  # 菜单
+        win.geometry("250x200")  # #窗口位置500后面是字母x
+        self.master = win
+        self.st = tkinter.StringVar()
+        # 创建Entry组件，将其textvariable绑定到self.st变量
+        ttk.Entry(self.master, textvariable=self.st,
+                  width=24,
+                  font=('StSong', 20, 'bold'),
+                  foreground='red').pack(fill=tkinter.BOTH, expand=tkinter.YES)
+        # 创建Frame作为容器
+        f = tkinter.Frame(self.master)
+        f.pack()
+        # 创建两个按钮，将其放入Frame中
+        ttk.Button(f, text='改变', command=self.change).pack(side=tkinter.LEFT)
+        ttk.Button(f, text='获取', command=self.get).pack(side=tkinter.LEFT)
+
+    def change(self):
+        books = ('疯狂Python讲义', '疯狂Kotlin讲义', '疯狂Swift讲义')
+        import random
+        # 改变self.st变量的值，与之绑定的Entry的内容随之改变
+        self.st.set(books[random.randint(0, 2)])
+
+    def get(self):
+        from tkinter import messagebox
+        # 获取self.st变量的值，实际上就是获取与之绑定的Entry中的内容
+        # 并使用消息框显示self.st变量的值
+        messagebox.showinfo(title='输入内容', message=self.st.get())
+
+    def gui_test18(self):  # 文件对话框
+        win = tkinter.Tk()
+        win.title("GUI 文件对话框")  # 菜单
+        win.geometry("900x200")  # #窗口位置500后面是字母x
+        self.master = win
+        # 创建7个按钮，并为之绑定事件处理函数
+        ttk.Button(self.master, text='打开单个文件',
+                   command=self.open_file  # 绑定open_file方法
+                   ).pack(side=tkinter.LEFT, ipadx=5, ipady=5, padx=10)
+        ttk.Button(self.master, text='打开多个文件',
+                   command=self.open_files  # 绑定open_files方法
+                   ).pack(side=tkinter.LEFT, ipadx=5, ipady=5, padx=10)
+        ttk.Button(self.master, text='获取单个打开文件的文件名',
+                   command=self.open_filename  # 绑定open_filename方法
+                   ).pack(side=tkinter.LEFT, ipadx=5, ipady=5, padx=10)
+        ttk.Button(self.master, text='获取多个打开文件的文件名',
+                   command=self.open_filenames  # 绑定open_filenames方法
+                   ).pack(side=tkinter.LEFT, ipadx=5, ipady=5, padx=10)
+        ttk.Button(self.master, text='获取保存文件',
+                   command=self.save_file  # 绑定save_file方法
+                   ).pack(side=tkinter.LEFT, ipadx=5, ipady=5, padx=10)
+        ttk.Button(self.master, text='获取保存文件的文件名',
+                   command=self.save_filename  # 绑定save_filename方法
+                   ).pack(side=tkinter.LEFT, ipadx=5, ipady=5, padx=10)
+        ttk.Button(self.master, text='打开路径',
+                   command=self.open_dir  # 绑定open_dir方法
+                   ).pack(side=tkinter.LEFT, ipadx=5, ipady=5, padx=10)
+
+    def open_file(self):
+        # 调用askopenfile方法获取单个打开的文件
+        print(tkinter.filedialog.askopenfile(title='打开单个文件',
+                                     filetypes=[("文本文件", "*.txt"), ('Python源文件', '*.py')],  # 只处理的文件类型
+                                     initialdir='g:/'))  # 初始目录
+
+    def open_files(self):
+        # 调用askopenfile方法获取多个打开的文件
+        print(tkinter.filedialog.askopenfiles(title='打开多个文件',
+                                      filetypes=[("文本文件", "*.txt"), ('Python源文件', '*.py')],  # 只处理的文件类型
+                                      initialdir='g:/'))  # 初始目录
+
+    def open_filename(self):
+        # 调用askopenfilename方法获取单个文件的文件名
+        print(tkinter.filedialog.askopenfilename(title='打开单个文件',
+                                         filetypes=[("文本文件", "*.txt"), ('Python源文件', '*.py')],  # 只处理的文件类型
+                                         initialdir='g:/'))  # 初始目录
+
+    def open_filenames(self):
+        # 调用askopenfilenames方法获取多个文件的文件名
+        print(tkinter.filedialog.askopenfilenames(title='打开多个文件',
+                                          filetypes=[("文本文件", "*.txt"), ('Python源文件', '*.py')],  # 只处理的文件类型
+                                          initialdir='g:/'))  # 初始目录
+
+    def save_file(self):
+        # 调用asksaveasfile方法保存文件
+        print(tkinter.filedialog.asksaveasfile(title='保存文件',
+                                       filetypes=[("文本文件", "*.txt"), ('Python源文件', '*.py')],  # 只处理的文件类型
+                                       initialdir='g:/'))  # 初始目录
+
+    def save_filename(self):
+        # 调用asksaveasfilename方法获取保存文件的文件名
+        print(tkinter.filedialog.asksaveasfilename(title='保存文件',
+                                           filetypes=[("文本文件", "*.txt"), ('Python源文件', '*.py')],  # 只处理的文件类型
+                                           initialdir='g:/'))  # 初始目录
+
+    def open_dir(self):
+        # 调用askdirectory方法打开目录
+        print(tkinter.filedialog.askdirectory(title='打开目录',
+                                      initialdir='g:/'))  # 初始目录
+    # Canvas绘制动画
+    def gui_test19(self):  #弹球小游戏
+        win = tkinter.Tk()
+        win.title("GUI 弹球小游戏")  # 菜单
+
+        # 得到屏幕宽度
+        sw = win.winfo_screenwidth()
+        # 得到屏幕高度
+        sh = win.winfo_screenheight()
+        ww = 500
+        wh = 620
+        '''
+        窗口宽高为100
+        屏幕宽 - 窗口宽 = 窗口两边的宽度（记得是两边，仔细想想）
+        然后我们除于一半得到屏幕左边的宽度，这就是我们窗口位于屏幕x轴开始的位置
+        '''
+        x = (sw - ww) / 2
+        y = (sh - wh) / 2
+        win.geometry("%dx%d+%d+%d" % (ww, wh, x, y))
+        #win.geometry("500x620")  # #窗口位置500后面是字母x
+        win.iconbitmap('images/Panda.ico')
+        # 禁止改变窗口大小
+        win.resizable(width=False, height=False)
+        # 设定窗口总是显示在最前面
+        win.wm_attributes("-topmost", 1)
+        canvasgame(win);
+
+    def gui_test20(self):  # 绘图
+        win = tkinter.Tk()
+        win.title("GUI 绘图")  # 菜单
+        # 得到屏幕宽度
+        sw = win.winfo_screenwidth()
+        # 得到屏幕高度
+        sh = win.winfo_screenheight()
+        ww = 500
+        wh = 620
+        '''
+        窗口宽高为100
+        屏幕宽 - 窗口宽 = 窗口两边的宽度（记得是两边，仔细想想）
+        然后我们除于一半得到屏幕左边的宽度，这就是我们窗口位于屏幕x轴开始的位置
+        '''
+        x = (sw - ww) / 2
+        y = (sh - wh) / 2
+        win.geometry("%dx%d+%d+%d" % (ww, wh, x, y))
+        # win.geometry("500x620")  # #窗口位置500后面是字母x
+        win.iconbitmap('images/Panda.ico')
+        # 禁止改变窗口大小
+        win.resizable(width=False, height=False)
+        # 设定窗口总是显示在最前面
+        win.wm_attributes("-topmost", 1)
+
+        painting(win)
+
+
 if __name__ == "__main__":
    #main()
    FL = GuiTest()
    # 进行布局
-   FL.gui_test16()
+   FL.gui_test20()
    # 主程序执行
    tkinter.mainloop()
 
