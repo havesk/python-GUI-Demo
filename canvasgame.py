@@ -11,6 +11,7 @@ BOARD_WIDTH = 80
 BALL_RADIUS = 9
 THREAD_ID = 0
 class canvasgame:
+    # 初始化参数
     def __init__(self, master):
         self.master = master
         # 记录小球动画的第几帧

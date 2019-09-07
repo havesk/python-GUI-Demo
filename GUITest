@@ -464,16 +464,16 @@ class GuiTest(object):
         f = tkinter.Frame(self.master)
         f.pack()
         # 创建两个按钮，将其放入Frame中
-        ttk.Button(f, text='改变', command=self.change).pack(side=tkinter.LEFT)
-        ttk.Button(f, text='获取', command=self.get).pack(side=tkinter.LEFT)
+        ttk.Button(f, text='改变', command=self.changeVar).pack(side=tkinter.LEFT)
+        ttk.Button(f, text='获取', command=self.getVar).pack(side=tkinter.LEFT)
 
-    def change(self):
+    def changeVar(self):
         books = ('疯狂Python讲义', '疯狂Kotlin讲义', '疯狂Swift讲义')
         import random
         # 改变self.st变量的值，与之绑定的Entry的内容随之改变
         self.st.set(books[random.randint(0, 2)])
 
-    def get(self):
+    def getVar(self):
         from tkinter import messagebox
         # 获取self.st变量的值，实际上就是获取与之绑定的Entry中的内容
         # 并使用消息框显示self.st变量的值
@@ -605,7 +605,12 @@ if __name__ == "__main__":
    #main()
    FL = GuiTest()
    # 进行布局
-   FL.gui_test20()
+
+   #框架控件
+   #FL.gui_test9()
+   #界面切换
+   FL.gui_test10()
+
    # 主程序执行
    tkinter.mainloop()
 
